@@ -1,12 +1,23 @@
 package com.wovenpay.wovenpay;
 
-import com.wovenpay.wovenpay.interfaces.Network;
-import com.wovenpay.wovenpay.interfaces.WovenResponse;
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.wovenpay.wovenpay.interfaces.AuthComplete;
+import com.wovenpay.wovenpay.interfaces.WovenService;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
 import com.wovenpay.wovenpay.models.TokenResponse;
 
 import java.io.IOException;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -20,7 +31,7 @@ public class WovenPay {
     private final String LIVE_URL = "https://api.wovenpay.com";
 
     private Retrofit retrofit;
-    private Network network;
+    private WovenService wovenService;
 
     private String url;
     private String token;
@@ -36,13 +47,21 @@ public class WovenPay {
         this.apiSecret = apiSecret;
         this.live = live;
 
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(live ? this.LIVE_URL : this.SANDBOX_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .client(client)
                 .build();
 
-        this.network = retrofit.create(Network.class);
+        this.wovenService = retrofit.create(WovenService.class);
     }
 
     public String getToken() {
@@ -72,13 +91,27 @@ public class WovenPay {
     /**
      * Authenticate woven api
      *
-     * @param email         Email
-     * @param password      Password
-     * @param wovenResponse For callback
+     * @param email        Email
+     * @param password     Password
+     * @param authComplete For callback
      */
-    public void getAuthorizationToken(String email, String password, WovenResponse wovenResponse) throws IOException {
+    public void getAuthorizationToken(String email, String password, final AuthComplete authComplete) {
         AuthenticateModel authData = new AuthenticateModel(email, password);
-        Response<TokenResponse> response = network.authorize(authData).execute();
-        wovenResponse.onResponse(response.toString());
+        wovenService.authorize(authData).enqueue(new Callback<TokenResponse>() {
+            @Override
+            public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
+                if (response.isSuccessful()) {
+                    System.out.println(response.body().getToken());
+                    authComplete.onComplete(true, response.body().getToken(), response.message());
+                } else {
+                    authComplete.onComplete(false, null, response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TokenResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 }

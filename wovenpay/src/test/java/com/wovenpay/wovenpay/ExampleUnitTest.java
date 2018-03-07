@@ -1,12 +1,16 @@
 package com.wovenpay.wovenpay;
 
-import android.util.Log;
-
-import com.wovenpay.wovenpay.interfaces.WovenResponse;
+import com.wovenpay.wovenpay.interfaces.AuthComplete;
 
 import org.junit.Test;
+import org.mockito.Mock;
 
 import java.io.IOException;
+
+import okhttp3.mockwebserver.MockWebServer;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -29,15 +33,12 @@ public class ExampleUnitTest {
 
     @Test
     public void authWovenPay() {
-        try {
-            wovenPay.getAuthorizationToken(email, password, new WovenResponse() {
-                @Override
-                public void onResponse(String response) {
-                    System.out.println(response);
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        wovenPay.getAuthorizationToken(email, wrongPassword, new AuthComplete() {
+            @Override
+            public void onComplete(boolean success, String token, String message) {
+                System.out.println("Lo!");
+//                assertTrue(success && token != null);
+            }
+        });
     }
 }

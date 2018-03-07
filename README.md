@@ -36,6 +36,9 @@ class MainActivity extends AppCompatActivity {
     void setToken(String token){
         wovenPay.setToken(token);
     }
+    
+    //to get the current token
+    String token = wovenPay.getToken();
 }
 ```
 
@@ -46,6 +49,8 @@ class MainActivity extends AppCompatActivity {
 class MainActivity extends AppCompatActivity {
     public void setTimeout(){
         wovenPay.setTimeout(5000);
+        //get set timeout
+        int timeout = wovenPay.getTimeout();
     }
 }
 ```
@@ -55,6 +60,8 @@ class MainActivity extends AppCompatActivity {
 class MainActivity extends AppCompatActivity {
     public void setVersion(){
         wovenPay.setVersion(1);
+        //get set version
+        int version = wovenpay.getVersion();
     }
 }
 ```
@@ -106,5 +113,41 @@ class MainActivity extends AppCompatActivity {
 }
 ```
 
+## Verify token
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void verifyToken(){
+        wovenPay.verifyAuthorizationToken(new OnTokenVerifyListener() {
+            @Override
+            public void onVerify(boolean success, String token, String message) {
+                if (success) {
+                    wovenPay.setToken(token);
+                    tvAuth.setText(String.format("Verified Token : %s", token));
+                    return;
+                }
+        
+                tvAuth.setText(String.format("Auth token verify error %s ", message));
+            }
+        });
+    }
+}
+```
+
 ### Todo
+- [x] Authenticate
+- [x] Set token
+- [x] Refresh token
+- [x] Verify token
+- [x] Set timeout
+- [x] Set version
+- [ ] Account api
+- [ ] Business/Apps
+- [ ] Customer
+- [ ] Plan
+- [ ] Subscription
+- [ ] Payments
+- [ ] Webhooks
 - [ ] Publish AAR to jCenter and Maven Central

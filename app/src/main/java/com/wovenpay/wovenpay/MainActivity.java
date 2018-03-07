@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
+import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,10 +31,13 @@ public class MainActivity extends AppCompatActivity {
         final TextView tvAuth = findViewById(R.id.tvToken);
         Button bAuth = findViewById(R.id.bAuth);
         Button bRefresh = findViewById(R.id.bRefresh);
+        Button bVerify = findViewById(R.id.bVerify);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
+        wovenPay.getVersion();
         wovenPay.setTimeout(5000);
+        wovenPay.getTimeout();
 
         bAuth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(boolean success, String token, String message) {
                         if (success) {
                             wovenPay.setToken(token);
+                            // get set token
+                            wovenPay.getToken();
                             tvAuth.setText(String.format("Token : %s", token));
                             return;
                         }
@@ -59,13 +65,31 @@ public class MainActivity extends AppCompatActivity {
                 wovenPay.refreshAuthorizationToken(new OnTokenRefreshListener() {
                     @Override
                     public void onRefresh(boolean success, String token, String message) {
-                        if(success){
+                        if (success) {
                             wovenPay.setToken(token);
                             tvAuth.setText(String.format("Refresh Token : %s", token));
                             return;
                         }
 
                         tvAuth.setText(String.format("Auth token refresh error %s ", message));
+                    }
+                });
+            }
+        });
+
+        bVerify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.verifyAuthorizationToken(new OnTokenVerifyListener() {
+                    @Override
+                    public void onVerify(boolean success, String token, String message) {
+                        if (success) {
+                            wovenPay.setToken(token);
+                            tvAuth.setText(String.format("Verified Token : %s", token));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Auth token verify error %s ", message));
                     }
                 });
             }

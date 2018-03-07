@@ -1,21 +1,15 @@
 package com.wovenpay.wovenpay;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
+import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.WovenService;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
 import com.wovenpay.wovenpay.models.TokenResponse;
 
-import java.io.IOException;
-
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -43,7 +37,7 @@ public class WovenPay {
     private String apiSecret;
     private boolean live = false;
 
-    public WovenPay(String apiKey, String apiSecret, boolean live) {
+    WovenPay(String apiKey, String apiSecret, boolean live) {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
         this.live = live;
@@ -96,7 +90,7 @@ public class WovenPay {
      * @param password     Password
      * @param authComplete For callback
      */
-    public void getAuthorizationToken(String email, String password, final AuthComplete authComplete) {
+    void getAuthorizationToken(String email, String password, final AuthComplete authComplete) {
         AuthenticateModel authData = new AuthenticateModel(email, password);
         wovenService.authorize(authData).enqueue(new Callback<TokenResponse>() {
             @Override
@@ -115,7 +109,12 @@ public class WovenPay {
         });
     }
 
-    public void refreshAuthorizationToken(final OnTokenRefreshListener onTokenRefreshListener) {
+    /**
+     * Refresh auth token, get a new one
+     *
+     * @param onTokenRefreshListener Callback interface method
+     */
+    void refreshAuthorizationToken(final OnTokenRefreshListener onTokenRefreshListener) {
         TokenResponse tokenResponse = new TokenResponse();
         tokenResponse.setToken(token);
         wovenService.refreshToken(tokenResponse).enqueue(new Callback<TokenResponse>() {
@@ -132,6 +131,31 @@ public class WovenPay {
             @Override
             public void onFailure(Call<TokenResponse> call, Throwable t) {
                 t.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Verify token
+     * @param onTokenVerifyListener
+     */
+    void verifyAuthorizationToken(final OnTokenVerifyListener onTokenVerifyListener) {
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setToken(token);
+        wovenService.verifyToken(tokenResponse).enqueue(new Callback<TokenResponse>() {
+            @Override
+            public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
+                if (response.isSuccessful()) {
+                    onTokenVerifyListener.onVerify(true, response.body().getToken(), null);
+                    return;
+                }
+
+                onTokenVerifyListener.onVerify(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<TokenResponse> call, Throwable t) {
+
             }
         });
     }

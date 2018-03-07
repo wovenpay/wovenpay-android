@@ -6,9 +6,11 @@ import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
+import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
 import com.wovenpay.wovenpay.interfaces.WovenService;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
 import com.wovenpay.wovenpay.models.Customer;
+import com.wovenpay.wovenpay.models.ListTransactionsResponse;
 import com.wovenpay.wovenpay.models.Order;
 import com.wovenpay.wovenpay.models.PaymentChargeResponse;
 import com.wovenpay.wovenpay.models.PaymentPayload;
@@ -217,6 +219,30 @@ public class WovenPay {
             }
         });
 
+    }
+
+    /**
+     * List all transactions made to a business/app
+     *
+     * @param onTransactionsListener Callback for when the async job is done
+     */
+    void transactions(final OnTransactionsListener onTransactionsListener) {
+        wovenService.listTransactions(getXpayHeader()).enqueue(new Callback<ListTransactionsResponse>() {
+            @Override
+            public void onResponse(Call<ListTransactionsResponse> call, Response<ListTransactionsResponse> response) {
+                if (response.isSuccessful()) {
+                    onTransactionsListener.onComplete(true, response.body().getTransations(), null);
+                    return;
+                }
+
+                onTransactionsListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<ListTransactionsResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     private String getXpayHeader() {

@@ -10,6 +10,11 @@ import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
+import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
+import com.wovenpay.wovenpay.models.Transation;
+
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         Button bRefresh = findViewById(R.id.bRefresh);
         Button bVerify = findViewById(R.id.bVerify);
         Button bCharge = findViewById(R.id.bCharge);
+        Button bListTransactions = findViewById(R.id.bListTransactions);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -118,6 +124,23 @@ public class MainActivity extends AppCompatActivity {
                                 tvAuth.setText(String.format("Failed: %s\nMessage: %s", transactionId, message));
                             }
                         });
+            }
+        });
+
+        bListTransactions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.transactions(new OnTransactionsListener() {
+                    @Override
+                    public void onComplete(boolean success, List<Transation> transationList, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transationList.size()));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Error: %s", message));
+                    }
+                });
             }
         });
     }

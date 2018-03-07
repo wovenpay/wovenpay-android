@@ -167,6 +167,28 @@ class MainActivity extends AppCompatActivity {
 }
 ```
 
+### Get list of Payment transactions
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void fetchTransactionList(){
+         wovenPay.transactions(new OnTransactionsListener() {
+            @Override
+            public void onComplete(boolean success, List<Transation> transationList, String message) {
+                if (success) {
+                    tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transationList.size()));
+                    return;
+                }
+         
+                tvAuth.setText(String.format("Error: %s", message));
+            }
+         });       
+    }
+}
+```
+
 ### Todo
 - [x] Authenticate
 - [x] Set token

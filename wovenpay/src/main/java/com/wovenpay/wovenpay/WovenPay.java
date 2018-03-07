@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnAccountListener;
+import com.wovenpay.wovenpay.interfaces.OnBusinessListListener;
+import com.wovenpay.wovenpay.interfaces.OnBusinessListener;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnStatusListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
@@ -12,7 +14,9 @@ import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
 import com.wovenpay.wovenpay.interfaces.WovenService;
 import com.wovenpay.wovenpay.models.AccountResponse;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
+import com.wovenpay.wovenpay.models.Business;
 import com.wovenpay.wovenpay.models.Customer;
+import com.wovenpay.wovenpay.models.EditBusinessPayload;
 import com.wovenpay.wovenpay.models.ListTransactionsResponse;
 import com.wovenpay.wovenpay.models.Order;
 import com.wovenpay.wovenpay.models.PaymentChargeResponse;
@@ -21,6 +25,8 @@ import com.wovenpay.wovenpay.models.TokenResponse;
 import com.wovenpay.wovenpay.models.TransactionStatusResponse;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -235,7 +241,7 @@ public class WovenPay {
             @Override
             public void onResponse(Call<ListTransactionsResponse> call, Response<ListTransactionsResponse> response) {
                 if (response.isSuccessful()) {
-                    onTransactionsListener.onComplete(true, response.body().getTransations(), null);
+                    onTransactionsListener.onComplete(true, response.body().getTransactions(), null);
                     return;
                 }
 
@@ -304,6 +310,79 @@ public class WovenPay {
                     }
                 }
         );
+    }
+
+    /**
+     * Get all businesses
+     *
+     * @param onBusinessListListener Callback
+     */
+    void getAllBusinesses(final OnBusinessListListener onBusinessListListener) {
+        wovenService.allBusinesses(getAuthToken()).enqueue(new Callback<List<Business>>() {
+            @Override
+            public void onResponse(Call<List<Business>> call, Response<List<Business>> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onBusinessListListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                onBusinessListListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<List<Business>> call, Throwable t) {
+                t.printStackTrace();
+                onBusinessListListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    void getBusiness(String businessId, final OnBusinessListener onBusinessListener) {
+        wovenService.getBusiness(getAuthToken(), businessId).enqueue(new Callback<Business>() {
+            @Override
+            public void onResponse(Call<Business> call, Response<Business> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onBusinessListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                onBusinessListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Business> call, Throwable t) {
+                t.printStackTrace();
+                onBusinessListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+
+    void editBusiness(String businessId, String name, String email, int phoneNumber, String country, final OnBusinessListener onBusinessListener) {
+        EditBusinessPayload business = new EditBusinessPayload();
+        business.setName(name);
+        business.setEmail(email);
+        business.setPhoneNumber(phoneNumber);
+        business.setCountry(country);
+
+        wovenService.editBusiness(getAuthToken(), businessId, business).enqueue(new Callback<Business>() {
+            @Override
+            public void onResponse(Call<Business> call, Response<Business> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onBusinessListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                onBusinessListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Business> call, Throwable t) {
+                t.printStackTrace();
+                onBusinessListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+
     }
 
     private String getXpayHeader() {

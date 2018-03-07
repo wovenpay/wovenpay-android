@@ -64,5 +64,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Account details" />
+
+        <Button
+            android:id="@+id/bAllBusinesses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Businesses" />
+
+        <Button
+            android:id="@+id/bGetBusiness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Business" />
+
+        <Button
+            android:id="@+id/bEditBusiness"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit Business" />
     </LinearLayout>
 </ScrollView>

@@ -9,13 +9,16 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnAccountListener;
+import com.wovenpay.wovenpay.interfaces.OnBusinessListListener;
+import com.wovenpay.wovenpay.interfaces.OnBusinessListener;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnStatusListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
 import com.wovenpay.wovenpay.models.AccountResponse;
-import com.wovenpay.wovenpay.models.Transation;
+import com.wovenpay.wovenpay.models.Business;
+import com.wovenpay.wovenpay.models.Transaction;
 
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         Button bListTransactions = findViewById(R.id.bListTransactions);
         Button bStatus = findViewById(R.id.bStatus);
         Button bAccount = findViewById(R.id.bAccount);
+        Button bAllBusinesses = findViewById(R.id.bAllBusinesses);
+        Button bGetBusiness = findViewById(R.id.bGetBusiness);
+        Button bEditBusiness = findViewById(R.id.bEditBusiness);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -138,9 +144,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 wovenPay.transactions(new OnTransactionsListener() {
                     @Override
-                    public void onComplete(boolean success, List<Transation> transationList, String message) {
+                    public void onComplete(boolean success, List<Transaction> transactionList, String message) {
                         if (success) {
-                            tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transationList.size()));
+                            tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transactionList.size()));
                             return;
                         }
 
@@ -179,6 +185,57 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("Account Details error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bAllBusinesses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.getAllBusinesses(new OnBusinessListListener() {
+                    @Override
+                    public void onComplete(boolean success, List<Business> businesses, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Businesses: %s", new Gson().toJson(businesses)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Get all business error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bGetBusiness.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.getBusiness(testBusiness, new OnBusinessListener() {
+                    @Override
+                    public void onComplete(boolean success, Business business, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Business: %s", new Gson().toJson(business)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Get business error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bEditBusiness.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.editBusiness(testBusiness, "business name", "business@email.com", 23456789, "KE", new OnBusinessListener() {
+                    @Override
+                    public void onComplete(boolean success, Business business, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Edited business: %s", new Gson().toJson(business)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Edit business error: %s", message));
                     }
                 });
             }

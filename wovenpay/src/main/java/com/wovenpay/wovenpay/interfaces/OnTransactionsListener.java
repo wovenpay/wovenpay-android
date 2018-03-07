@@ -1,6 +1,6 @@
 package com.wovenpay.wovenpay.interfaces;
 
-import com.wovenpay.wovenpay.models.Transation;
+import com.wovenpay.wovenpay.models.Transaction;
 
 import java.util.List;
 
@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface OnTransactionsListener {
 
-    void onComplete(boolean success, List<Transation> transactionList, String message);
+    void onComplete(boolean success, List<Transaction> transactionList, String message);
 }

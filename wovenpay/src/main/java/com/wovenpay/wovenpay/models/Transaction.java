@@ -3,7 +3,7 @@ package com.wovenpay.wovenpay.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Transation {
+public class Transaction {
 
     @SerializedName("id")
     @Expose

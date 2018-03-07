@@ -15,7 +15,7 @@ import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
 import com.wovenpay.wovenpay.models.AccountResponse;
-import com.wovenpay.wovenpay.models.Transation;
+import com.wovenpay.wovenpay.models.Transaction;
 
 import java.util.List;
 import java.util.Locale;
@@ -138,9 +138,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 wovenPay.transactions(new OnTransactionsListener() {
                     @Override
-                    public void onComplete(boolean success, List<Transation> transationList, String message) {
+                    public void onComplete(boolean success, List<Transaction> transactionList, String message) {
                         if (success) {
-                            tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transationList.size()));
+                            tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transactionList.size()));
                             return;
                         }
 

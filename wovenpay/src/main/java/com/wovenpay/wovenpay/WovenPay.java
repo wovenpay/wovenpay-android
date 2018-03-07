@@ -235,7 +235,7 @@ public class WovenPay {
             @Override
             public void onResponse(Call<ListTransactionsResponse> call, Response<ListTransactionsResponse> response) {
                 if (response.isSuccessful()) {
-                    onTransactionsListener.onComplete(true, response.body().getTransations(), null);
+                    onTransactionsListener.onComplete(true, response.body().getTransactions(), null);
                     return;
                 }
 

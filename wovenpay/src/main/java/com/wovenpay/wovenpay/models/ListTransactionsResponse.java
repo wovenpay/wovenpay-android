@@ -19,7 +19,7 @@ public class ListTransactionsResponse {
     private Object previous;
     @SerializedName("results")
     @Expose
-    private List<Transation> transations = new ArrayList<>();
+    private List<Transaction> transactions = new ArrayList<>();
 
     public Integer getCount() {
         return count;
@@ -45,12 +45,12 @@ public class ListTransactionsResponse {
         this.previous = previous;
     }
 
-    public List<Transation> getTransations() {
-        return transations;
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
-    public void setTransations(List<Transation> transations) {
-        this.transations = transations;
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 
 }

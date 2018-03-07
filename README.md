@@ -199,9 +199,9 @@ class MainActivity extends AppCompatActivity {
     public void fetchTransactionList(){
          wovenPay.transactions(new OnTransactionsListener() {
             @Override
-            public void onComplete(boolean success, List<Transation> transationList, String message) {
+            public void onComplete(boolean success, List<Transation> transactionList, String message) {
                 if (success) {
-                    tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transationList.size()));
+                    tvAuth.setText(String.format(Locale.getDefault(), "Transactions %d", transactionList.size()));
                     return;
                 }
          

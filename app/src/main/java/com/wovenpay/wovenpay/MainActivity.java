@@ -9,12 +9,14 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnAccountListener;
+import com.wovenpay.wovenpay.interfaces.OnBusinessListener;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnStatusListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
 import com.wovenpay.wovenpay.models.AccountResponse;
+import com.wovenpay.wovenpay.models.Business;
 import com.wovenpay.wovenpay.models.Transaction;
 
 import java.util.List;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         Button bListTransactions = findViewById(R.id.bListTransactions);
         Button bStatus = findViewById(R.id.bStatus);
         Button bAccount = findViewById(R.id.bAccount);
+        Button bAllBusinesses = findViewById(R.id.bAllBusinesses);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -179,6 +182,23 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("Account Details error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bAllBusinesses.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.getAllBusinesses(new OnBusinessListener() {
+                    @Override
+                    public void onComplete(boolean success, List<Business> businesses, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Businesses: %s", new Gson().toJson(businesses)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Get all business error: %s", message));
                     }
                 });
             }

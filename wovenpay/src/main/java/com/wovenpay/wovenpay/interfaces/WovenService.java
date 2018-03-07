@@ -6,11 +6,15 @@ package com.wovenpay.wovenpay.interfaces;
 
 import com.wovenpay.wovenpay.models.AccountResponse;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
+import com.wovenpay.wovenpay.models.EditBusinessPayload;
+import com.wovenpay.wovenpay.models.Business;
 import com.wovenpay.wovenpay.models.ListTransactionsResponse;
 import com.wovenpay.wovenpay.models.PaymentChargeResponse;
 import com.wovenpay.wovenpay.models.PaymentPayload;
 import com.wovenpay.wovenpay.models.TokenResponse;
 import com.wovenpay.wovenpay.models.TransactionStatusResponse;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -18,6 +22,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface WovenService {
@@ -48,4 +53,14 @@ public interface WovenService {
 
     @GET("/me/")
     Call<AccountResponse> accountDetails(@Header("Authorization") String token);
+
+    @GET("/business/")
+    Call<List<Business>> allBusinesses(@Header("Authorization") String token);
+
+    @GET("/business/{businessId}/")
+    Call<Business> getBusiness(@Header("Authorization") String token, @Path("businessId") String businessId);
+
+    @Headers("Content-Type:application/json")
+    @PUT("/business/{businessId}/")
+    Call<Business> editBusiness(@Header("Authorization") String token, @Path("businessId") String businessId, @Body EditBusinessPayload payload);
 }

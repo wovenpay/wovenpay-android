@@ -14,7 +14,15 @@ import retrofit2.http.POST;
 
 public interface WovenService {
 
-        @Headers("Content-Type:application/json")
-        @POST("/authorize/")
-        Call<TokenResponse> authorize(@Body AuthenticateModel body);
+    @Headers("Content-Type:application/json")
+    @POST("/authorize/")
+    Call<TokenResponse> authorize(@Body AuthenticateModel body);
+
+    @Headers("Content-Type:application/json")
+    @POST("/token/actions/refresh/")
+    Call<TokenResponse> refreshToken(@Body TokenResponse body);
+
+    @Headers("Content-Type:application/json")
+    @POST("/token/actions/verify/")
+    Call<TokenResponse> verifyToken(@Body TokenResponse body);
 }

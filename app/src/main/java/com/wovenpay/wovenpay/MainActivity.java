@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
+import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView tvAuth = findViewById(R.id.tvToken);
         Button bAuth = findViewById(R.id.bAuth);
+        Button bRefresh = findViewById(R.id.bRefresh);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -46,6 +48,24 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("Auth failed error %s ", message));
+                    }
+                });
+            }
+        });
+
+        bRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.refreshAuthorizationToken(new OnTokenRefreshListener() {
+                    @Override
+                    public void onRefresh(boolean success, String token, String message) {
+                        if(success){
+                            wovenPay.setToken(token);
+                            tvAuth.setText(String.format("Refresh Token : %s", token));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Auth token refresh error %s ", message));
                     }
                 });
             }

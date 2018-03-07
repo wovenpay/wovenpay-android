@@ -83,5 +83,28 @@ class MainActivity extends AppCompatActivity {
 }
 ```
 
+## Refresh token
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void refreshToken(){
+        wovenPay.refreshAuthorizationToken(new OnTokenRefreshListener() {
+            @Override
+            public void onRefresh(boolean success, String token, String message) {
+                if(success){
+                    wovenPay.setToken(token);
+                    tvAuth.setText(String.format("Refresh Token : %s", token));
+                    return;
+                }
+        
+                tvAuth.setText(String.format("Auth token refresh error %s ", message));
+            }
+        });
+    }
+}
+```
+
 ### Todo
 - [ ] Publish AAR to jCenter and Maven Central

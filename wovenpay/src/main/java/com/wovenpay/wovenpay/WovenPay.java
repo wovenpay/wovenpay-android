@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
+import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.WovenService;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
 import com.wovenpay.wovenpay.models.TokenResponse;
@@ -101,11 +102,31 @@ public class WovenPay {
             @Override
             public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
                 if (response.isSuccessful()) {
-                    System.out.println(response.body().getToken());
                     authComplete.onComplete(true, response.body().getToken(), response.message());
                 } else {
                     authComplete.onComplete(false, null, response.message());
                 }
+            }
+
+            @Override
+            public void onFailure(Call<TokenResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    }
+
+    public void refreshAuthorizationToken(final OnTokenRefreshListener onTokenRefreshListener) {
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setToken(token);
+        wovenService.refreshToken(tokenResponse).enqueue(new Callback<TokenResponse>() {
+            @Override
+            public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
+                if (response.isSuccessful()) {
+                    onTokenRefreshListener.onRefresh(true, response.body().getToken(), null);
+                    return;
+                }
+
+                onTokenRefreshListener.onRefresh(false, null, response.message());
             }
 
             @Override

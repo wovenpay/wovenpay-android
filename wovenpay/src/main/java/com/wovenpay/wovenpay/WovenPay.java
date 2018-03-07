@@ -3,11 +3,18 @@ package com.wovenpay.wovenpay;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
+import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.WovenService;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
+import com.wovenpay.wovenpay.models.Customer;
+import com.wovenpay.wovenpay.models.Order;
+import com.wovenpay.wovenpay.models.PaymentChargeResponse;
+import com.wovenpay.wovenpay.models.PaymentPayload;
 import com.wovenpay.wovenpay.models.TokenResponse;
+
+import org.jetbrains.annotations.NotNull;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -96,7 +103,8 @@ public class WovenPay {
             @Override
             public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
                 if (response.isSuccessful()) {
-                    authComplete.onComplete(true, response.body().getToken(), response.message());
+                    authComplete.onComplete(true, response.body().getToken(),
+                            response.message());
                 } else {
                     authComplete.onComplete(false, null, response.message());
                 }
@@ -121,7 +129,8 @@ public class WovenPay {
             @Override
             public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
                 if (response.isSuccessful()) {
-                    onTokenRefreshListener.onRefresh(true, response.body().getToken(), null);
+                    onTokenRefreshListener.onRefresh(true, response.body().getToken(),
+                            null);
                     return;
                 }
 
@@ -137,6 +146,7 @@ public class WovenPay {
 
     /**
      * Verify token
+     *
      * @param onTokenVerifyListener
      */
     void verifyAuthorizationToken(final OnTokenVerifyListener onTokenVerifyListener) {
@@ -146,7 +156,8 @@ public class WovenPay {
             @Override
             public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
                 if (response.isSuccessful()) {
-                    onTokenVerifyListener.onVerify(true, response.body().getToken(), null);
+                    onTokenVerifyListener.onVerify(true, response.body().getToken(),
+                            null);
                     return;
                 }
 
@@ -158,5 +169,57 @@ public class WovenPay {
 
             }
         });
+    }
+
+    /**
+     * Charge payment aganist a user
+     *
+     * @param amount            Amount to charge
+     * @param customerEmail     Customer email
+     * @param method            Method of payment, Only accepts 'mobile.mpesa'
+     * @param mobile            Mobile number to charge. If you have used 'mobile.mpesa' as method you have to
+     *                          provide a valid mpesa number
+     * @param orderDescription  Order description
+     * @param reference         Reference
+     * @param onPaymentListener Callback method for when a charge completes
+     */
+    void chargePayment(double amount, String customerEmail, String method, String mobile,
+                       String orderDescription, String reference,
+                       final OnPaymentListener onPaymentListener) {
+        PaymentPayload paymentPayload = new PaymentPayload();
+        paymentPayload.setAmount(amount);
+        Customer customer = new Customer();
+        customer.setEmail(customerEmail);
+        paymentPayload.setCustomer(customer);
+        paymentPayload.setMethod(method);
+        paymentPayload.setMobile(mobile);
+        paymentPayload.setReference(reference);
+        Order order = new Order();
+        order.setDescription(orderDescription);
+        paymentPayload.setOrder(order);
+
+        wovenService.chargePayment(getXpayHeader(), paymentPayload).enqueue(new Callback<PaymentChargeResponse>() {
+            @Override
+            public void onResponse(@NotNull Call<PaymentChargeResponse> call, @NotNull Response<PaymentChargeResponse> response) {
+                if (response.isSuccessful() && response.body().getStatus().equals("pending")) {
+                    onPaymentListener.onComplete(true, response.body().getTransactionId(), null);
+                    return;
+                }
+
+                if (response.isSuccessful() && response.body().getStatus().equals("failed")) {
+                    onPaymentListener.onComplete(false, response.body().getTransactionId(), response.body().getMetadata().toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PaymentChargeResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+    }
+
+    private String getXpayHeader() {
+        return String.format("%s:%s", this.apiKey, this.apiSecret);
     }
 }

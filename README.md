@@ -136,6 +136,37 @@ class MainActivity extends AppCompatActivity {
 }
 ```
 
+## Payments
+
+### Make Payments Charge
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void makePaymentCharge(){
+        wovenPay.chargePayment(
+            10,
+            "test@test.com",
+            "mobile.mpesa",
+            "+254977777777", // replace this with your mpesa phone number :-)
+            "Order description",
+            "Reference",
+            new OnPaymentListener() {
+                @Override
+                public void onComplete(boolean success, String transactionId, String message) {
+                    if (success) {
+                        tvAuth.setText(String.format("Success: %s", transactionId));
+                        return;
+                    }
+        
+                    tvAuth.setText(String.format("Failed: %s\nMessage: %s", transactionId, message));
+                }
+            });
+    }
+}
+```
+
 ### Todo
 - [x] Authenticate
 - [x] Set token

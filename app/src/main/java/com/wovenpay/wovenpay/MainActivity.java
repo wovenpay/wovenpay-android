@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
+import com.wovenpay.wovenpay.interfaces.OnStatusListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         Button bVerify = findViewById(R.id.bVerify);
         Button bCharge = findViewById(R.id.bCharge);
         Button bListTransactions = findViewById(R.id.bListTransactions);
+        Button bStatus = findViewById(R.id.bStatus);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -139,6 +141,23 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("Error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.status("txn_272uXW8ZfepxMW3kHyEj7f", new OnStatusListener() {
+                    @Override
+                    public void onComplete(boolean success, String status, String paymentId, String error) {
+                        if (success) {
+                            tvAuth.setText(String.format("Status: %s\nPayment id: %s", status, paymentId));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Error: %s", error));
                     }
                 });
             }

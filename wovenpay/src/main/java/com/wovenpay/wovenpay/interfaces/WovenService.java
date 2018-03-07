@@ -9,6 +9,7 @@ import com.wovenpay.wovenpay.models.ListTransactionsResponse;
 import com.wovenpay.wovenpay.models.PaymentChargeResponse;
 import com.wovenpay.wovenpay.models.PaymentPayload;
 import com.wovenpay.wovenpay.models.TokenResponse;
+import com.wovenpay.wovenpay.models.TransactionStatusResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -16,6 +17,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface WovenService {
 
@@ -39,4 +41,7 @@ public interface WovenService {
     @GET("/payments/")
     Call<ListTransactionsResponse> listTransactions(@Header("XPAY") String xpayHeader);
 
+    @Headers("Content-Type:application/json")
+    @GET("/payments/{transactionId}/status")
+    Call<TransactionStatusResponse> status(@Header("XPAY") String xpayHeader, @Path("transactionId") String transactionId);
 }

@@ -48,4 +48,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="List transactions" />
+
+    <Button
+        android:id="@+id/bStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Check transaction status" />
 </LinearLayout>

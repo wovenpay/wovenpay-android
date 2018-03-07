@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
+import com.wovenpay.wovenpay.interfaces.OnStatusListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
@@ -15,6 +16,7 @@ import com.wovenpay.wovenpay.models.Order;
 import com.wovenpay.wovenpay.models.PaymentChargeResponse;
 import com.wovenpay.wovenpay.models.PaymentPayload;
 import com.wovenpay.wovenpay.models.TokenResponse;
+import com.wovenpay.wovenpay.models.TransactionStatusResponse;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -243,6 +245,33 @@ public class WovenPay {
                 t.printStackTrace();
             }
         });
+    }
+
+    /**
+     * Check status of a transaction
+     *
+     * @param transactionId    Transaction id of the transaction you want to check status for
+     * @param onStatusListener Callback for when transaction status check is done
+     */
+    void status(String transactionId, final OnStatusListener onStatusListener) {
+        wovenService.status(getXpayHeader(), transactionId).enqueue(
+                new Callback<TransactionStatusResponse>() {
+                    @Override
+                    public void onResponse(Call<TransactionStatusResponse> call, Response<TransactionStatusResponse> response) {
+                        if (response.isSuccessful() && response.code() == 200) {
+                            onStatusListener.onComplete(true, response.body().getStatus(), response.body().getPaymentId(), null);
+                            return;
+                        }
+
+                        onStatusListener.onComplete(false, null, null, response.body().getErrors().getMessage());
+                    }
+
+                    @Override
+                    public void onFailure(Call<TransactionStatusResponse> call, Throwable t) {
+
+                    }
+                }
+        );
     }
 
     private String getXpayHeader() {

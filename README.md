@@ -189,6 +189,31 @@ class MainActivity extends AppCompatActivity {
 }
 ```
 
+### Transaction Status
+
+Checking for transaction status
+
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void transactionStatus(){
+        wovenPay.status("txn_272uXW8ZfepxMW3kHyEj7f", new OnStatusListener() {
+            @Override
+            public void onComplete(boolean success, String status, String paymentId, String error) {
+                if (success) {
+                    tvAuth.setText(String.format("Status: %s\nPayment id: %s", status, paymentId));
+                    return;
+                }
+        
+                tvAuth.setText(String.format("Error: %s", error));
+            }
+        });
+    }
+}    
+```
+
 ### Todo
 - [x] Authenticate
 - [x] Set token
@@ -201,6 +226,6 @@ class MainActivity extends AppCompatActivity {
 - [ ] Customer
 - [ ] Plan
 - [ ] Subscription
-- [ ] Payments
+- [x] Payments
 - [ ] Webhooks
 - [ ] Publish AAR to jCenter and Maven Central

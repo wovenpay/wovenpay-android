@@ -4,6 +4,28 @@ Note that we support android SDK 14 and above. You can checkout our [API documen
 
 Woven Payments Android SDK is an abstraction on top of Woven Payments REST api to help you intergrate Woven effortlessly to your android application
 
+## Table of Contents
+- [wovenpay-android](#wovenpay-android)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+- [Create a new Instance of wovenpay](#create-a-new-instance-of-wovenpay)
+- [Add token](#add-token)
+- [Add request timeout](#add-request-timeout)
+- [Change API version](#change-api-version)
+- [Get token](#get-token)
+- [Refresh token](#refresh-token)
+- [Verify token](#verify-token)
+- [Account](#account)
+- [Business/Apps](#businessesapps)
+    - [Get all businesses](#get-all-businesses)
+    - [Get a specific business](#get-specific-business)
+    - [Edit a business](#edit-a-business)
+- [Payments](#payments)
+    - [Make payments charge](#make-payments-charge)
+    - [Get list of Payment transactions](#get-list-of-payment-transactions)
+    - [Transaction status](#transaction-status)
+- [Todo list](#todo)
+
 ## Installation
 
 To download the SDK, add it as a dependency to the application level `build.gradle`
@@ -314,7 +336,7 @@ class MainActivity extends AppCompatActivity {
 - [x] Set timeout
 - [x] Set version
 - [x] Account
-- [ ] Business/Apps
+- [x] Business/Apps
 - [ ] Customer
 - [ ] Plan
 - [ ] Subscription

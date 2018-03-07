@@ -159,6 +159,75 @@ class MainActivity extends AppCompatActivity {
 }
 ```
 
+## Businesses/Apps
+
+### Get all businesses
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void getAllBusinesses(){
+        wovenPay.getAllBusinesses(new OnBusinessListListener() {
+            @Override
+            public void onComplete(boolean success, List<Business> businesses, String message) {
+                if (success) {
+                    tvAuth.setText(String.format("Businesses: %s", new Gson().toJson(businesses)));
+                    return;
+                }
+        
+                tvAuth.setText(String.format("Get all business error: %s", message));
+            }
+        });
+    }
+}
+```
+
+### Get specific business
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void getBusiness(){
+        wovenPay.getBusiness(testBusiness, new OnBusinessListener() {
+            @Override
+            public void onComplete(boolean success, Business business, String message) {
+                if (success) {
+                    tvAuth.setText(String.format("Business: %s", new Gson().toJson(business)));
+                    return;
+                }
+                
+                tvAuth.setText(String.format("Get business error: %s", message));
+            }
+        });
+    }
+}
+```
+
+### Edit a business
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void editBusiness(){
+         wovenPay.editBusiness(testBusiness, "business name", "business@email.com", 23456789, "KE", new OnBusinessListener() {
+            @Override
+            public void onComplete(boolean success, Business business, String message) {
+                if (success) {
+                    tvAuth.setText(String.format("Edited business: %s", new Gson().toJson(business)));
+                    return;
+                }
+         
+                tvAuth.setText(String.format("Edit business error: %s", message));
+            }
+         });
+    }
+}
+```
+
+
 ## Payments
 
 ### Make Payments Charge

@@ -6,12 +6,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
+import com.wovenpay.wovenpay.interfaces.OnAccountListener;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnStatusListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
+import com.wovenpay.wovenpay.models.AccountResponse;
 import com.wovenpay.wovenpay.models.Transation;
 
 import java.util.List;
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         Button bCharge = findViewById(R.id.bCharge);
         Button bListTransactions = findViewById(R.id.bListTransactions);
         Button bStatus = findViewById(R.id.bStatus);
+        Button bAccount = findViewById(R.id.bAccount);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -158,6 +162,23 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("Error: %s", error));
+                    }
+                });
+            }
+        });
+
+        bAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.accountDetails(new OnAccountListener() {
+                    @Override
+                    public void onComplete(boolean success, AccountResponse accountResponse, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Account: %s", new Gson().toJson(accountResponse)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Account Details error: %s", message));
                     }
                 });
             }

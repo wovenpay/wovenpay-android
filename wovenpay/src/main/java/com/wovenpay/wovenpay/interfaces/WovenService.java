@@ -4,6 +4,7 @@ package com.wovenpay.wovenpay.interfaces;
  * Created by thatmarc_ on 06-Mar-18.
  */
 
+import com.wovenpay.wovenpay.models.AccountResponse;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
 import com.wovenpay.wovenpay.models.ListTransactionsResponse;
 import com.wovenpay.wovenpay.models.PaymentChargeResponse;
@@ -44,4 +45,7 @@ public interface WovenService {
     @Headers("Content-Type:application/json")
     @GET("/payments/{transactionId}/status")
     Call<TransactionStatusResponse> status(@Header("XPAY") String xpayHeader, @Path("transactionId") String transactionId);
+
+    @GET("/me/")
+    Call<AccountResponse> accountDetails(@Header("Authorization") String token);
 }

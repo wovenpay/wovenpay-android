@@ -136,6 +136,29 @@ class MainActivity extends AppCompatActivity {
 }
 ```
 
+## Account
+Get account details
+```java
+class MainActivity extends AppCompatActivity {
+    
+    WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+    
+    public void getAccountDetails(){
+         wovenPay.accountDetails(new OnAccountListener() {
+            @Override
+            public void onComplete(boolean success, AccountResponse accountResponse, String message) {
+                if (success) {
+                    tvAuth.setText(String.format("Account: %s", new Gson().toJson(accountResponse)));
+                    return;
+                }
+        
+                tvAuth.setText(String.format("Account Details error: %s", message));
+            }
+         });
+    }
+}
+```
+
 ## Payments
 
 ### Make Payments Charge
@@ -221,7 +244,7 @@ class MainActivity extends AppCompatActivity {
 - [x] Verify token
 - [x] Set timeout
 - [x] Set version
-- [ ] Account api
+- [x] Account
 - [ ] Business/Apps
 - [ ] Customer
 - [ ] Plan

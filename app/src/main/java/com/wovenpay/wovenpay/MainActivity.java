@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         Button bAuth = findViewById(R.id.bAuth);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+        wovenPay.setVersion(1);
+        wovenPay.setTimeout(5000);
 
         bAuth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(boolean success, String token, String message) {
                         if (success) {
+                            wovenPay.setToken(token);
                             tvAuth.setText(String.format("Token : %s", token));
                             return;
                         }

@@ -3,12 +3,14 @@ package com.wovenpay.wovenpay;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wovenpay.wovenpay.interfaces.AuthComplete;
+import com.wovenpay.wovenpay.interfaces.OnAccountListener;
 import com.wovenpay.wovenpay.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpay.interfaces.OnStatusListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpay.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpay.interfaces.OnTransactionsListener;
 import com.wovenpay.wovenpay.interfaces.WovenService;
+import com.wovenpay.wovenpay.models.AccountResponse;
 import com.wovenpay.wovenpay.models.AuthenticateModel;
 import com.wovenpay.wovenpay.models.Customer;
 import com.wovenpay.wovenpay.models.ListTransactionsResponse;
@@ -268,7 +270,37 @@ public class WovenPay {
 
                     @Override
                     public void onFailure(Call<TransactionStatusResponse> call, Throwable t) {
+                        t.printStackTrace();
+                        onStatusListener.onComplete(false, null, null, t.getLocalizedMessage());
+                    }
+                }
+        );
+    }
 
+    /**
+     * Get account details
+     *
+     * @param onAccountListener Callback
+     */
+    void accountDetails(final OnAccountListener onAccountListener) {
+        wovenService.accountDetails(getAuthToken()).enqueue(
+                new Callback<AccountResponse>() {
+                    @Override
+                    public void onResponse(Call<AccountResponse> call, Response<AccountResponse> response) {
+                        if (response.isSuccessful() && response.code() == 200) {
+                            onAccountListener.onComplete(true, response.body(), null);
+                            return;
+                        }
+
+                        if (response.code() == 401) {
+                            onAccountListener.onComplete(false, null, response.message());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<AccountResponse> call, Throwable t) {
+                        t.printStackTrace();
+                        onAccountListener.onComplete(false, null, t.getMessage());
                     }
                 }
         );
@@ -276,5 +308,9 @@ public class WovenPay {
 
     private String getXpayHeader() {
         return String.format("%s:%s", this.apiKey, this.apiSecret);
+    }
+
+    private String getAuthToken() {
+        return String.format("Token %s", this.token);
     }
 }

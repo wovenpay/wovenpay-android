@@ -30,11 +30,13 @@ Woven Payments Android SDK is an abstraction on top of Woven Payments REST api t
 
 To download the SDK, add it as a dependency to the application level `build.gradle`
 
+
 ```
 dependencies {
   compile 'com.wovenpay.wovenpay:see.latest.version'
 }
 ```
+__latest version__ :  [![Download](https://api.bintray.com/packages/wovenpay/wovenpay-android/wovenpay-android/images/download.svg)](https://bintray.com/wovenpay/wovenpay-android/wovenpay-android/_latestVersion)
 
 ## Create a new Instance of wovenpay
 

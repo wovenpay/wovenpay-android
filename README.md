@@ -344,4 +344,4 @@ class MainActivity extends AppCompatActivity {
 - [ ] Subscription
 - [x] Payments
 - [ ] Webhooks
-- [ ] Publish AAR to jCenter and Maven Central
+- [x] Publish AAR to jCenter and Maven Central

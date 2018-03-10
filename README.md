@@ -24,6 +24,12 @@ Woven Payments Android SDK is an abstraction on top of Woven Payments REST api t
     - [Make payments charge](#make-payments-charge)
     - [Get list of Payment transactions](#get-list-of-payment-transactions)
     - [Transaction status](#transaction-status)
+- [Customer](https://github.com/wovenpay/wovenpay-android/tree/customer#customer)
+    - [Create a new customer](https://github.com/wovenpay/wovenpay-android/tree/customer#create-a-new-customer)
+    - [Edit a customer](https://github.com/wovenpay/wovenpay-android/tree/customer#edit-a-customer)
+    - [Delete a customer](https://github.com/wovenpay/wovenpay-android/tree/customer#delete-a-customer)
+    - [Retrieve all customers](https://github.com/wovenpay/wovenpay-android/tree/customer#retrieve-all-customers)
+    - [Retrieve Specific customer](https://github.com/wovenpay/wovenpay-android/tree/customer#retrieve-specific-customer)
 - [Todo list](#todo)
 
 ## Installation
@@ -330,6 +336,120 @@ class MainActivity extends AppCompatActivity {
 }    
 ```
 
+### Customer
+
+#### Create a new customer
+```java
+class MainActivity extends AppCompatActivity {
+   WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+   
+   public void createCustomer(){
+        Customer c = new Customer();
+        c.setEmail("hhhhhsdah@gmail.com");
+        wovenPay.createCustomer(c, new OnCustomerListener() {
+        @Override
+        public void onComplete(boolean success, Customer customerResponse, String message) {
+            if (success) {
+               testCustomer = customerResponse.getId();
+               tvAuth.setText(String.format("Created customer: %s", new Gson().toJson(customerResponse)));
+               return;
+            }
+       
+            tvAuth.setText(String.format("Created customer error: %s", message));
+        }});
+   }
+}
+```
+
+#### Edit a customer
+
+```java
+class MainActivity extends AppCompatActivity {
+   WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+   
+   public void createCustomer(){
+        Customer customer = new Customer();
+        customer.setEmail("ecustomessr@gmail.com");
+        wovenPay.editCustomer(testCustomer, customer, new OnCustomerListener() {
+        @Override
+        public void onComplete(boolean success, Customer customerResponse, String message) {
+            if (success) {
+                tvAuth.setText(String.format("Edited customer: %s", new Gson().toJson(customerResponse)));
+                return;
+            }
+       
+            tvAuth.setText(String.format("Error editing customer: %s", message));
+        }
+        });
+   }
+}
+```
+
+#### Delete a customer
+
+```java
+class MainActivity extends AppCompatActivity {
+   WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+   
+   public void createCustomer(){
+        wovenPay.deleteCustomer(testCustomer, new OnDeleteCustomerListener() {
+            @Override
+            public void onComplete(boolean success, String message) {
+                if (success) {
+                    tvAuth.setText("Deleted customer ");
+                    return;
+                }
+        
+            tvAuth.setText(String.format("delete customer error: %s", message));
+        }});
+   }
+}
+```
+
+#### Retrieve all customers
+
+```java
+class MainActivity extends AppCompatActivity {
+   WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+   
+   public void createCustomer(){
+        wovenPay.getCustomers(new OnCustomersListener() {
+            @Override
+            public void onComplete(boolean success, List<Customer> customerResponseList, String message) {
+                if (success) {
+                    tvAuth.setText(String.format("Got customers : %s", new Gson().toJson(customerResponseList)));
+                    return;
+                }
+        
+                tvAuth.setText(String.format("Get customers error: %s", message));
+            }
+        });
+   }
+}
+```
+
+#### Retrieve Specific customer
+
+```java
+class MainActivity extends AppCompatActivity {
+   WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
+   
+   public void createCustomer(){
+         wovenPay.getCustomer(testCustomer, new OnCustomerListener() {
+                @Override
+                public void onComplete(boolean success, Customer customerResponse, String message) {
+                    if (success) {
+                    tvAuth.setText(String.format("Got customer : %s", new Gson().toJson(customerResponse)));
+                    return;
+                }
+                
+                tvAuth.setText(String.format("Get customer error: %s", message));
+            }
+        });
+   }
+}
+```
+
 ### Todo
 - [x] Authenticate
 - [x] Set token
@@ -339,7 +459,7 @@ class MainActivity extends AppCompatActivity {
 - [x] Set version
 - [x] Account
 - [x] Business/Apps
-- [ ] Customer
+- [x] Customer
 - [ ] Plan
 - [ ] Subscription
 - [x] Payments

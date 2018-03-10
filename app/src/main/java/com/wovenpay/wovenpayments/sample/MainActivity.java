@@ -12,6 +12,9 @@ import com.wovenpay.wovenpayments.interfaces.AuthComplete;
 import com.wovenpay.wovenpayments.interfaces.OnAccountListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListener;
+import com.wovenpay.wovenpayments.interfaces.OnCustomerListener;
+import com.wovenpay.wovenpayments.interfaces.OnCustomersListener;
+import com.wovenpay.wovenpayments.interfaces.OnDeleteCustomerListener;
 import com.wovenpay.wovenpayments.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpayments.interfaces.OnStatusListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenRefreshListener;
@@ -19,6 +22,7 @@ import com.wovenpay.wovenpayments.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpayments.interfaces.OnTransactionsListener;
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.Business;
+import com.wovenpay.wovenpayments.models.Customer;
 import com.wovenpay.wovenpayments.models.Transaction;
 
 import java.util.List;
@@ -34,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
     final String testToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYWNjX2JrVVJrNGI2MnE2WGJXaE5DZWphUjMiLCJ1c2VybmFtZSI6InRlc3RAdGVzdC5jb20iLCJleHAiOjE1MTk3MDE2ODgsImVtYWlsIjoidGVzdEB0ZXN0LmNvbSIsIm9yaWdfaWF0IjoxNTE5NjU4NDg4fQ.p7V85SFoZ3WPF08c5MdkVPgQllB6DGZ6pS8w_OSmTdU";
 
     final String testBusiness = "bus_B6cDFj4uTz4AuFAUFzPFgm";
-    final String testCustomer = "cus_BBmafrJiRgTJaVh5aenwLm";
     final String testPlan = "plan_jpcms2jwkvHbinJHvHygkZ";
+
+    String testCustomer = "cus_JBkyB88VbjNhux2PQTivmH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView tvAuth = findViewById(R.id.tvToken);
         Button bAuth = findViewById(R.id.bAuth);
-        Button bRefresh = findViewById(R.id.bRefresh);
+        final Button bRefresh = findViewById(R.id.bRefresh);
         Button bVerify = findViewById(R.id.bVerify);
         Button bCharge = findViewById(R.id.bCharge);
         Button bListTransactions = findViewById(R.id.bListTransactions);
@@ -53,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
         Button bAllBusinesses = findViewById(R.id.bAllBusinesses);
         Button bGetBusiness = findViewById(R.id.bGetBusiness);
         Button bEditBusiness = findViewById(R.id.bEditBusiness);
+        Button bCreateCustomer = findViewById(R.id.bCreateCustomer);
+        Button bEditCustomer = findViewById(R.id.bEditCustomer);
+        Button bGetCustomer = findViewById(R.id.bGetCustomer);
+        Button bGetCustomers = findViewById(R.id.bGetCustomers);
+        Button bDeleteCustomer = findViewById(R.id.bDeleteCustomer);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -237,6 +247,97 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("Edit business error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bCreateCustomer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Customer c = new Customer();
+                c.setEmail("hhhhhsdah@gmail.com");
+                wovenPay.createCustomer(c, new OnCustomerListener() {
+                    @Override
+                    public void onComplete(boolean success, Customer customerResponse, String message) {
+                        if (success) {
+                            testCustomer = customerResponse.getId();
+                            tvAuth.setText(String.format("Created customer: %s", new Gson().toJson(customerResponse)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Created customer error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bEditCustomer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Customer customer = new Customer();
+                customer.setEmail("ecustomessr@gmail.com");
+                wovenPay.editCustomer(testCustomer, customer, new OnCustomerListener() {
+                    @Override
+                    public void onComplete(boolean success, Customer customerResponse, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Edited customer: %s", new Gson().toJson(customerResponse)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Error editing customer: %s", message));
+                    }
+                });
+            }
+        });
+
+
+        bGetCustomer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.getCustomer(testCustomer, new OnCustomerListener() {
+                    @Override
+                    public void onComplete(boolean success, Customer customerResponse, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Got customer : %s", new Gson().toJson(customerResponse)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Get customer error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bGetCustomers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.getCustomers(new OnCustomersListener() {
+                    @Override
+                    public void onComplete(boolean success, List<Customer> customerResponseList, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Got customers : %s", new Gson().toJson(customerResponseList)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Get customers error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bDeleteCustomer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.deleteCustomer(testCustomer, new OnDeleteCustomerListener() {
+                    @Override
+                    public void onComplete(boolean success, String message) {
+                        if (success) {
+                            tvAuth.setText("Deleted customer ");
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("delete customer error: %s", message));
                     }
                 });
             }

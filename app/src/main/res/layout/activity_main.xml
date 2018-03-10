@@ -82,5 +82,35 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Edit Business" />
+
+        <Button
+            android:id="@+id/bCreateCustomer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create customer" />
+
+        <Button
+            android:id="@+id/bEditCustomer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit customer" />
+
+        <Button
+            android:id="@+id/bDeleteCustomer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete customer" />
+
+        <Button
+            android:id="@+id/bGetCustomer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get customer" />
+
+        <Button
+            android:id="@+id/bGetCustomers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get customers" />
     </LinearLayout>
 </ScrollView>

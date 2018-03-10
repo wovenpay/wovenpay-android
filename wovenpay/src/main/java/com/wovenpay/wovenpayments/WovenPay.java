@@ -1,14 +1,14 @@
 package com.wovenpay.wovenpayments;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wovenpay.wovenpayments.interfaces.AuthComplete;
 import com.wovenpay.wovenpayments.interfaces.OnAccountListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListener;
-import com.wovenpay.wovenpayments.interfaces.OnCreateCustomerListener;
+import com.wovenpay.wovenpayments.interfaces.OnCustomerListener;
+import com.wovenpay.wovenpayments.interfaces.OnCustomersListener;
+import com.wovenpay.wovenpayments.interfaces.OnDeleteCustomerListener;
 import com.wovenpay.wovenpayments.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpayments.interfaces.OnStatusListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenRefreshListener;
@@ -19,9 +19,9 @@ import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.AuthenticateModel;
 import com.wovenpay.wovenpayments.models.Business;
 import com.wovenpay.wovenpayments.models.CreateCustomerPayload;
-import com.wovenpay.wovenpayments.models.CreateCustomerResponse;
 import com.wovenpay.wovenpayments.models.Customer;
 import com.wovenpay.wovenpayments.models.EditBusinessPayload;
+import com.wovenpay.wovenpayments.models.GetCustomersResponse;
 import com.wovenpay.wovenpayments.models.ListTransactionsResponse;
 import com.wovenpay.wovenpayments.models.Order;
 import com.wovenpay.wovenpayments.models.PaymentChargeResponse;
@@ -31,6 +31,9 @@ import com.wovenpay.wovenpayments.models.TransactionStatusResponse;
 
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -66,14 +69,14 @@ public class WovenPay {
                 .setLenient()
                 .create();
 
-//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(live ? this.LIVE_URL : this.SANDBOX_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
-//                .client(client)
+                .client(client)
                 .build();
 
         this.wovenService = retrofit.create(WovenService.class);
@@ -386,29 +389,117 @@ public class WovenPay {
 
     }
 
-    public void createCustomer(String email, final OnCreateCustomerListener onCreateCustomerListener) {
-        CreateCustomerPayload c = new CreateCustomerPayload();
-        c.setEmail(email);
-        wovenService.createCustomer(getAuthToken(), c).enqueue(new Callback<CreateCustomerResponse>() {
+    public void createCustomer(Customer customer, final OnCustomerListener onCustomerListener) {
+        wovenService.createCustomer(getAuthToken(), customer).enqueue(new Callback<Customer>() {
             @Override
-            public void onResponse(Call<CreateCustomerResponse> call, Response<CreateCustomerResponse> response) {
+            public void onResponse(Call<Customer> call, Response<Customer> response) {
                 if (response.isSuccessful() && response.code() == 201) {
-                    onCreateCustomerListener.onComplete(true, response.body(), null);
+                    onCustomerListener.onComplete(true, response.body(), null);
                     return;
                 }
 
                 if (response.code() == 400) {
-                    onCreateCustomerListener.onComplete(false, null, "Customer with given details already exists.");
+                    onCustomerListener.onComplete(false, null, "Customer with given details already exists.");
                     return;
                 }
 
-                onCreateCustomerListener.onComplete(false, null, response.message());
+                onCustomerListener.onComplete(false, null, response.message());
             }
 
             @Override
-            public void onFailure(Call<CreateCustomerResponse> call, Throwable t) {
+            public void onFailure(Call<Customer> call, Throwable t) {
                 t.printStackTrace();
-                onCreateCustomerListener.onComplete(false, null, t.getLocalizedMessage());
+                onCustomerListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void editCustomer(String customerId, Customer customer, final OnCustomerListener onCustomerListener) {
+        wovenService.editCustomer(getAuthToken(), customerId, customer).enqueue(new Callback<Customer>() {
+            @Override
+            public void onResponse(Call<Customer> call, Response<Customer> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onCustomerListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                onCustomerListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Customer> call, Throwable t) {
+                t.printStackTrace();
+                onCustomerListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void deleteCustomer(String customerId, final OnDeleteCustomerListener onDeleteCustomerListener) {
+        wovenService.deleteCustomer(getAuthToken(), customerId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.code() == 204) {
+                    onDeleteCustomerListener.onComplete(true, "Customer deleted");
+                    return;
+                }
+
+                if (response.code() == 404) {
+                    onDeleteCustomerListener.onComplete(false, "Customer not found");
+                    return;
+                }
+
+                onDeleteCustomerListener.onComplete(false, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+                onDeleteCustomerListener.onComplete(false, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void getCustomer(String customerId, final OnCustomerListener onCustomerListener) {
+        wovenService.getCustomer(getAuthToken(), customerId).enqueue(new Callback<Customer>() {
+            @Override
+            public void onResponse(Call<Customer> call, Response<Customer> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onCustomerListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                if (response.code() == 404) {
+                    onCustomerListener.onComplete(false, null, "No Customer matches the given query.");
+                    return;
+                }
+
+                onCustomerListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Customer> call, Throwable t) {
+                t.printStackTrace();
+                onCustomerListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void getCustomers(final OnCustomersListener onCustomersListener) {
+        wovenService.getCustomers(getAuthToken()).enqueue(new Callback<GetCustomersResponse>() {
+            @Override
+            public void onResponse(Call<GetCustomersResponse> call, Response<GetCustomersResponse> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onCustomersListener.onComplete(true, response.body().getResults(), null);
+                    return;
+                }
+
+                onCustomersListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<GetCustomersResponse> call, Throwable t) {
+                t.printStackTrace();
+                onCustomersListener.onComplete(false, null, t.getLocalizedMessage());
             }
         });
     }

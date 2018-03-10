@@ -24,6 +24,12 @@ Woven Payments Android SDK is an abstraction on top of Woven Payments REST api t
     - [Make payments charge](#make-payments-charge)
     - [Get list of Payment transactions](#get-list-of-payment-transactions)
     - [Transaction status](#transaction-status)
+- [Customer](https://github.com/wovenpay/wovenpay-android/tree/customer#customer)
+    - [Create a new customer](https://github.com/wovenpay/wovenpay-android/tree/customer#create-a-new-customer)
+    - [Edit a customer](https://github.com/wovenpay/wovenpay-android/tree/customer#edit-a-customer)
+    - [Delete a customer](https://github.com/wovenpay/wovenpay-android/tree/customer#delete-a-customer)
+    - [Retrieve all customers](https://github.com/wovenpay/wovenpay-android/tree/customer#retrieve-all-customers)
+    - [Retrieve Specific customer](https://github.com/wovenpay/wovenpay-android/tree/customer#retrieve-specific-customer)
 - [Todo list](#todo)
 
 ## Installation

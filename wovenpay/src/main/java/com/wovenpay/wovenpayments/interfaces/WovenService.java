@@ -6,6 +6,8 @@ package com.wovenpay.wovenpayments.interfaces;
 
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.AuthenticateModel;
+import com.wovenpay.wovenpayments.models.CreateCustomerPayload;
+import com.wovenpay.wovenpayments.models.CreateCustomerResponse;
 import com.wovenpay.wovenpayments.models.EditBusinessPayload;
 import com.wovenpay.wovenpayments.models.Business;
 import com.wovenpay.wovenpayments.models.ListTransactionsResponse;
@@ -63,4 +65,8 @@ public interface WovenService {
     @Headers("Content-Type:application/json")
     @PUT("/business/{businessId}/")
     Call<Business> editBusiness(@Header("Authorization") String token, @Path("businessId") String businessId, @Body EditBusinessPayload payload);
+
+    @Headers("Content-Type:application/json")
+    @POST("/customers/")
+    Call<CreateCustomerResponse> createCustomer(@Header("Authorization") String token, @Body CreateCustomerPayload customerPayload);
 }

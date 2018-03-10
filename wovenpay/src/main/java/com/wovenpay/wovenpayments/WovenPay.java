@@ -1,11 +1,14 @@
 package com.wovenpay.wovenpayments;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.wovenpay.wovenpayments.interfaces.AuthComplete;
 import com.wovenpay.wovenpayments.interfaces.OnAccountListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListener;
+import com.wovenpay.wovenpayments.interfaces.OnCreateCustomerListener;
 import com.wovenpay.wovenpayments.interfaces.OnPaymentListener;
 import com.wovenpay.wovenpayments.interfaces.OnStatusListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenRefreshListener;
@@ -15,6 +18,8 @@ import com.wovenpay.wovenpayments.interfaces.WovenService;
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.AuthenticateModel;
 import com.wovenpay.wovenpayments.models.Business;
+import com.wovenpay.wovenpayments.models.CreateCustomerPayload;
+import com.wovenpay.wovenpayments.models.CreateCustomerResponse;
 import com.wovenpay.wovenpayments.models.Customer;
 import com.wovenpay.wovenpayments.models.EditBusinessPayload;
 import com.wovenpay.wovenpayments.models.ListTransactionsResponse;
@@ -192,8 +197,8 @@ public class WovenPay {
      * @param onPaymentListener Callback method for when a charge completes
      */
     public void chargePayment(double amount, String customerEmail, String method, String mobile,
-                       String orderDescription, String reference,
-                       final OnPaymentListener onPaymentListener) {
+                              String orderDescription, String reference,
+                              final OnPaymentListener onPaymentListener) {
         PaymentPayload paymentPayload = new PaymentPayload();
         paymentPayload.setAmount(amount);
         Customer customer = new Customer();
@@ -379,6 +384,33 @@ public class WovenPay {
             }
         });
 
+    }
+
+    public void createCustomer(String email, final OnCreateCustomerListener onCreateCustomerListener) {
+        CreateCustomerPayload c = new CreateCustomerPayload();
+        c.setEmail(email);
+        wovenService.createCustomer(getAuthToken(), c).enqueue(new Callback<CreateCustomerResponse>() {
+            @Override
+            public void onResponse(Call<CreateCustomerResponse> call, Response<CreateCustomerResponse> response) {
+                if (response.isSuccessful() && response.code() == 201) {
+                    onCreateCustomerListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                if (response.code() == 400) {
+                    onCreateCustomerListener.onComplete(false, null, "Customer with given details already exists.");
+                    return;
+                }
+
+                onCreateCustomerListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<CreateCustomerResponse> call, Throwable t) {
+                t.printStackTrace();
+                onCreateCustomerListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
     }
 
     private String getXpayHeader() {

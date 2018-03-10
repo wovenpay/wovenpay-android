@@ -1,10 +1,9 @@
 apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.wovenpay.wovenpay"
+        applicationId "com.wovenpay.wovenpayments.sample"
         minSdkVersion 14
         targetSdkVersion 26
         versionCode 1
@@ -27,8 +26,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation project(':wovenpay')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+//    implementation project(':wovenpay')
+    compile 'com.wovenpay.wovenpayments:wovenpayments:1.0.8'
 }
 repositories {
     mavenCentral()

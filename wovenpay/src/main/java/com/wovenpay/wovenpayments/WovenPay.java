@@ -28,6 +28,7 @@ import com.wovenpay.wovenpayments.models.PaymentChargeResponse;
 import com.wovenpay.wovenpayments.models.PaymentPayload;
 import com.wovenpay.wovenpayments.models.TokenResponse;
 import com.wovenpay.wovenpayments.models.TransactionStatusResponse;
+import com.wovenpay.wovenpayments.models.Webhook;
 
 import java.util.List;
 
@@ -500,6 +501,34 @@ public class WovenPay {
             public void onFailure(Call<GetCustomersResponse> call, Throwable t) {
                 t.printStackTrace();
                 onCustomersListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void createWebhook(Webhook webhook){
+        wovenService.createWebhook(getAuthToken(), webhook).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void deleteWebhook(String webhookId){
+        wovenService.deleteWebhook(getAuthToken(), webhookId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
             }
         });
     }

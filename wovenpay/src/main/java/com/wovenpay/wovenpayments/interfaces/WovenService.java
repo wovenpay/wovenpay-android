@@ -6,7 +6,7 @@ package com.wovenpay.wovenpayments.interfaces;
 
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.AuthenticateModel;
-import com.wovenpay.wovenpayments.models.CreateCustomerPayload;
+import com.wovenpay.wovenpayments.models.Webhook;
 import com.wovenpay.wovenpayments.models.Customer;
 import com.wovenpay.wovenpayments.models.EditBusinessPayload;
 import com.wovenpay.wovenpayments.models.Business;
@@ -85,4 +85,10 @@ public interface WovenService {
 
     @GET("/customers/")
     Call<GetCustomersResponse> getCustomers(@Header("Authorization") String token);
+
+    @POST("/webhooks/")
+    Call<ResponseBody> createWebhook(@Header("Authorization") String token, @Body Webhook webhook);
+
+    @DELETE("/webhooks/{webhookId}/")
+    Call<ResponseBody> deleteWebhook(@Header("Authorization") String token, @Path("webhookId") String webhookId);
 }

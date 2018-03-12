@@ -23,11 +23,13 @@ import com.wovenpay.wovenpayments.interfaces.OnStatusListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpayments.interfaces.OnTransactionsListener;
+import com.wovenpay.wovenpayments.interfaces.OnWebhookListener;
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.Business;
 import com.wovenpay.wovenpayments.models.Customer;
 import com.wovenpay.wovenpayments.models.Plan;
 import com.wovenpay.wovenpayments.models.Transaction;
+import com.wovenpay.wovenpayments.models.Webhook;
 
 import java.util.List;
 import java.util.Locale;
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         Button bGetPlan = findViewById(R.id.bGetPlan);
         Button bDeletePlan = findViewById(R.id.bDeletePlan);
         Button bEditPlan = findViewById(R.id.bEditPlan);
+        Button bCreateWebhook = findViewById(R.id.bCreateWebhook);
+        Button bDeleteWebhook = findViewById(R.id.bDeleteWebhook);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
@@ -442,6 +446,44 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("delete customer error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bCreateWebhook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Webhook webhook = new Webhook();
+                webhook.setEvent("customer.created");
+                webhook.setKey("test");
+                webhook.setTarget("https://paysstestf.ngrok.com/");
+                wovenPay.createWebhook(webhook, new OnWebhookListener() {
+                    @Override
+                    public void onComplete(boolean success, Webhook webhook, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Created webhook %s", new Gson().toJson(webhook)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Create webhook error %s", message));
+                    }
+                });
+            }
+        });
+
+        bDeleteWebhook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.deleteWebhook("80", new OnDeleteListener() {
+                    @Override
+                    public void onComplete(boolean success, String message) {
+                        if (success) {
+                            tvAuth.setText("Deleted!");
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Delete webhook error", message));
                     }
                 });
             }

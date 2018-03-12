@@ -16,6 +16,7 @@ import com.wovenpay.wovenpayments.interfaces.OnStatusListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpayments.interfaces.OnTransactionsListener;
+import com.wovenpay.wovenpayments.interfaces.OnWebhookListener;
 import com.wovenpay.wovenpayments.interfaces.WovenService;
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.AuthenticateModel;
@@ -32,6 +33,7 @@ import com.wovenpay.wovenpayments.models.PaymentPayload;
 import com.wovenpay.wovenpayments.models.Plan;
 import com.wovenpay.wovenpayments.models.TokenResponse;
 import com.wovenpay.wovenpayments.models.TransactionStatusResponse;
+import com.wovenpay.wovenpayments.models.Webhook;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -512,7 +514,8 @@ public class WovenPay {
         });
     }
 
-    public void createPlan(final Plan plan, final OnPlanListener onPlanListener) {
+    public void createPlan(final Plan plan,
+                           final OnPlanListener onPlanListener) {
         wovenService.createPlan(getAuthToken(), plan).enqueue(new Callback<CreatePlanResponse>() {
             @Override
             public void onResponse(Call<CreatePlanResponse> call, Response<CreatePlanResponse> response) {
@@ -614,6 +617,48 @@ public class WovenPay {
             }
         });
     }
+
+    public void createWebhook(final Webhook webhook, final OnWebhookListener onWebhookListener) {
+        wovenService.createWebhook(getAuthToken(), webhook).enqueue(new Callback<Webhook>() {
+            @Override
+            public void onResponse(Call<Webhook> call, Response<Webhook> response) {
+                if (response.isSuccessful() && response.code() == 201) {
+                    onWebhookListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                onWebhookListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Webhook> call, Throwable t) {
+                t.getLocalizedMessage();
+                onWebhookListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+
+    public void deleteWebhook(String webhookId, final OnDeleteListener onDeleteListener) {
+        wovenService.deleteWebhook(getAuthToken(), webhookId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.code() == 204) {
+                    onDeleteListener.onComplete(true, null);
+                    return;
+                }
+
+                onDeleteListener.onComplete(false, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.getLocalizedMessage();
+                onDeleteListener.onComplete(false, t.getLocalizedMessage());
+            }
+        });
+    }
+
 
     private String getXpayHeader() {
         return String.format("%s:%s", this.apiKey, this.apiSecret);

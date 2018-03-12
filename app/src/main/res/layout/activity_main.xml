@@ -142,5 +142,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Delete plan" />
+
+        <Button
+            android:id="@+id/bCreateWebhook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create webhook" />
+
+        <Button
+            android:id="@+id/bDeleteWebhook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete webhook" />
     </LinearLayout>
 </ScrollView>

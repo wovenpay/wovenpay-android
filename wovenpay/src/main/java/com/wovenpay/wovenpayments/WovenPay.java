@@ -34,6 +34,7 @@ import com.wovenpay.wovenpayments.models.TokenResponse;
 import com.wovenpay.wovenpayments.models.TransactionStatusResponse;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -57,8 +58,8 @@ public class WovenPay {
 
     private String url;
     private String token;
-    private int timeout;
-    private int version;
+    private int timeout = 30;
+    private int version = 1;
 
     private String apiKey;
     private String apiSecret;
@@ -75,7 +76,10 @@ public class WovenPay {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(timeout, TimeUnit.SECONDS)
+                .connectTimeout(timeout, TimeUnit.SECONDS)
+                .addInterceptor(interceptor).build();
 
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(live ? this.LIVE_URL : this.SANDBOX_URL)

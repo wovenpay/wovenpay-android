@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
         wovenPay.getVersion();
-        wovenPay.setTimeout(5000);
+        wovenPay.setTimeout(5);
         wovenPay.getTimeout();
 
         bAuth.setOnClickListener(new View.OnClickListener() {

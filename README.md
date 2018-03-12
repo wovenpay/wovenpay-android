@@ -43,6 +43,9 @@ If you intend to implement payments only, such as in an e-commerce application y
     - [Retrieve Specific plan](#retrieve-specific-plan)
     - [Edit a plan](#edit-a-plan)
     - [Delete a plan](#delete-a-plan)
+- [Webhook](#webhook)
+    - [Create a new webhook](#create-a-new-webhook)
+    - [Delete a webhook](#delete-a-webhook)
 - [Todo list](#todo)
 
 ## Installation

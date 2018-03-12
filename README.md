@@ -37,6 +37,12 @@ If you intend to implement payments only, such as in an e-commerce application y
     - [Delete a customer](#delete-a-customer)
     - [Retrieve all customers](#retrieve-all-customers)
     - [Retrieve Specific customer](#retrieve-specific-customer)
+- [Plan](#plan)
+    - [Create a new plan](#create-a-new-plan)
+    - [Retrieve all plans](#retrieve-all-plans)
+    - [Retrieve Specific plan](#retrieve-specific-plan)
+    - [Edit a plan](#edit-a-plan)
+    - [Delete a plan](#delete-a-plan)
 - [Todo list](#todo)
 
 ## Installation

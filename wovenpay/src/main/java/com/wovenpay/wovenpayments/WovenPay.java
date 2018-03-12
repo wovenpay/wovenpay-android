@@ -8,8 +8,10 @@ import com.wovenpay.wovenpayments.interfaces.OnBusinessListListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListener;
 import com.wovenpay.wovenpayments.interfaces.OnCustomerListener;
 import com.wovenpay.wovenpayments.interfaces.OnCustomersListener;
-import com.wovenpay.wovenpayments.interfaces.OnDeleteCustomerListener;
+import com.wovenpay.wovenpayments.interfaces.OnDeleteListener;
 import com.wovenpay.wovenpayments.interfaces.OnPaymentListener;
+import com.wovenpay.wovenpayments.interfaces.OnPlanListener;
+import com.wovenpay.wovenpayments.interfaces.OnPlansListener;
 import com.wovenpay.wovenpayments.interfaces.OnStatusListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenVerifyListener;
@@ -18,18 +20,21 @@ import com.wovenpay.wovenpayments.interfaces.WovenService;
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.AuthenticateModel;
 import com.wovenpay.wovenpayments.models.Business;
-import com.wovenpay.wovenpayments.models.CreateCustomerPayload;
+import com.wovenpay.wovenpayments.models.CreatePlanResponse;
 import com.wovenpay.wovenpayments.models.Customer;
 import com.wovenpay.wovenpayments.models.EditBusinessPayload;
 import com.wovenpay.wovenpayments.models.GetCustomersResponse;
+import com.wovenpay.wovenpayments.models.GetPlanResponse;
 import com.wovenpay.wovenpayments.models.ListTransactionsResponse;
 import com.wovenpay.wovenpayments.models.Order;
 import com.wovenpay.wovenpayments.models.PaymentChargeResponse;
 import com.wovenpay.wovenpayments.models.PaymentPayload;
+import com.wovenpay.wovenpayments.models.Plan;
 import com.wovenpay.wovenpayments.models.TokenResponse;
 import com.wovenpay.wovenpayments.models.TransactionStatusResponse;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -53,8 +58,8 @@ public class WovenPay {
 
     private String url;
     private String token;
-    private int timeout;
-    private int version;
+    private int timeout = 30;
+    private int version = 1;
 
     private String apiKey;
     private String apiSecret;
@@ -71,7 +76,10 @@ public class WovenPay {
 
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(timeout, TimeUnit.SECONDS)
+                .connectTimeout(timeout, TimeUnit.SECONDS)
+                .addInterceptor(interceptor).build();
 
         this.retrofit = new Retrofit.Builder()
                 .baseUrl(live ? this.LIVE_URL : this.SANDBOX_URL)
@@ -434,27 +442,27 @@ public class WovenPay {
         });
     }
 
-    public void deleteCustomer(String customerId, final OnDeleteCustomerListener onDeleteCustomerListener) {
+    public void deleteCustomer(String customerId, final OnDeleteListener onDeleteListener) {
         wovenService.deleteCustomer(getAuthToken(), customerId).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful() && response.code() == 204) {
-                    onDeleteCustomerListener.onComplete(true, "Customer deleted");
+                    onDeleteListener.onComplete(true, "Customer deleted");
                     return;
                 }
 
                 if (response.code() == 404) {
-                    onDeleteCustomerListener.onComplete(false, "Customer not found");
+                    onDeleteListener.onComplete(false, "Customer not found");
                     return;
                 }
 
-                onDeleteCustomerListener.onComplete(false, response.message());
+                onDeleteListener.onComplete(false, response.message());
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 t.printStackTrace();
-                onDeleteCustomerListener.onComplete(false, t.getLocalizedMessage());
+                onDeleteListener.onComplete(false, t.getLocalizedMessage());
             }
         });
     }
@@ -500,6 +508,109 @@ public class WovenPay {
             public void onFailure(Call<GetCustomersResponse> call, Throwable t) {
                 t.printStackTrace();
                 onCustomersListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void createPlan(final Plan plan, final OnPlanListener onPlanListener) {
+        wovenService.createPlan(getAuthToken(), plan).enqueue(new Callback<CreatePlanResponse>() {
+            @Override
+            public void onResponse(Call<CreatePlanResponse> call, Response<CreatePlanResponse> response) {
+                if (response.isSuccessful() && response.code() == 201) {
+                    Plan plan1 = new Plan();
+                    plan1.setBusiness(response.body().getBusiness());
+                    plan1.setName(response.body().getName());
+                    plan1.setPrice(Double.valueOf(response.body().getPrice()));
+                    onPlanListener.onComplete(true, plan1, null);
+                    return;
+                }
+
+                onPlanListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<CreatePlanResponse> call, Throwable t) {
+                t.printStackTrace();
+                onPlanListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void getPlans(final OnPlansListener onPlansListener) {
+        wovenService.getPlans(getAuthToken()).enqueue(new Callback<GetPlanResponse>() {
+            @Override
+            public void onResponse(Call<GetPlanResponse> call, Response<GetPlanResponse> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onPlansListener.onComplete(true, response.body().getPlans(), null);
+                    return;
+                }
+
+                onPlansListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<GetPlanResponse> call, Throwable t) {
+                t.printStackTrace();
+                onPlansListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void getPlan(String planId, final OnPlanListener onPlanListener) {
+        wovenService.getPlan(getAuthToken(), planId).enqueue(new Callback<Plan>() {
+            @Override
+            public void onResponse(Call<Plan> call, Response<Plan> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onPlanListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                onPlanListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Plan> call, Throwable t) {
+                t.printStackTrace();
+                onPlanListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void editPlan(String planId, Plan plan, final OnPlanListener onPlanListener) {
+        wovenService.editPlan(getAuthToken(), planId, plan).enqueue(new Callback<Plan>() {
+            @Override
+            public void onResponse(Call<Plan> call, Response<Plan> response) {
+                if (response.isSuccessful() && response.code() == 200) {
+                    onPlanListener.onComplete(true, response.body(), null);
+                    return;
+                }
+
+                onPlanListener.onComplete(false, null, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<Plan> call, Throwable t) {
+                t.printStackTrace();
+                onPlanListener.onComplete(false, null, t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void deletePlan(String planId, final OnDeleteListener onDeleteListener) {
+        wovenService.deletePlan(getAuthToken(), planId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.code() == 204) {
+                    onDeleteListener.onComplete(true, null);
+                    return;
+                }
+                onDeleteListener.onComplete(false, response.message());
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+                onDeleteListener.onComplete(false, t.getLocalizedMessage());
             }
         });
     }

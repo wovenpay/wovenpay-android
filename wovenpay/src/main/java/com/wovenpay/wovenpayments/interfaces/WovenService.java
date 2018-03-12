@@ -6,7 +6,9 @@ package com.wovenpay.wovenpayments.interfaces;
 
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.AuthenticateModel;
-import com.wovenpay.wovenpayments.models.CreateCustomerPayload;
+import com.wovenpay.wovenpayments.models.GetPlanResponse;
+import com.wovenpay.wovenpayments.models.Plan;
+import com.wovenpay.wovenpayments.models.CreatePlanResponse;
 import com.wovenpay.wovenpayments.models.Customer;
 import com.wovenpay.wovenpayments.models.EditBusinessPayload;
 import com.wovenpay.wovenpayments.models.Business;
@@ -26,6 +28,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -85,4 +88,21 @@ public interface WovenService {
 
     @GET("/customers/")
     Call<GetCustomersResponse> getCustomers(@Header("Authorization") String token);
+
+    @POST("/plans/")
+    @Headers("Content-Type:application/json")
+    Call<CreatePlanResponse> createPlan(@Header("Authorization") String token, @Body Plan plan);
+
+    @GET("/plans/")
+    Call<GetPlanResponse> getPlans(@Header("Authorization") String token);
+
+    @GET("/plans/{planId}/")
+    Call<Plan> getPlan(@Header("Authorization") String token, @Path("planId") String planId);
+
+    @PATCH("/plans/{planId}/")
+    @Headers("Content-Type:application/json")
+    Call<Plan> editPlan(@Header("Authorization") String token, @Path("planId") String planId, @Body Plan plan);
+
+    @DELETE("/plans/{planId}/")
+    Call<ResponseBody> deletePlan(@Header("Authorization") String token, @Path("planId") String planId);
 }

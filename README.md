@@ -1,4 +1,11 @@
+Be one of our first beta testers. submit your email on [this](https://wovenpay.com) form 
+
 # wovenpay-android
+WE ARE STILL IN ALPHA TESTING
+
+Would you like to know when we open for beta testing ? Submit your email on [this](https://wovenpay.com) form
+
+_Anything may change at any time. The public API should not be considered stable._
 
 Woven Payments Android SDK is an abstraction on top of Woven Payments REST api to help you intergrate Woven effortlessly to your android application. Process paymentsin your android application.
 

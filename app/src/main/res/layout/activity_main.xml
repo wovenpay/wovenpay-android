@@ -112,5 +112,47 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get customers" />
+
+        <Button
+            android:id="@+id/bGetPlans"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get plans" />
+
+        <Button
+            android:id="@+id/bCreatePlan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create plan" />
+
+        <Button
+            android:id="@+id/bGetPlan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get plan" />
+
+        <Button
+            android:id="@+id/bEditPlan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Edit plan" />
+
+        <Button
+            android:id="@+id/bDeletePlan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete plan" />
+
+        <Button
+            android:id="@+id/bCreateWebhook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create webhook" />
+
+        <Button
+            android:id="@+id/bDeleteWebhook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Delete webhook" />
     </LinearLayout>
 </ScrollView>

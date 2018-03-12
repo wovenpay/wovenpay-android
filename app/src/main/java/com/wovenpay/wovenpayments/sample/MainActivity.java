@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.wovenpay.wovenpayments.WovenPay;
@@ -14,16 +15,21 @@ import com.wovenpay.wovenpayments.interfaces.OnBusinessListListener;
 import com.wovenpay.wovenpayments.interfaces.OnBusinessListener;
 import com.wovenpay.wovenpayments.interfaces.OnCustomerListener;
 import com.wovenpay.wovenpayments.interfaces.OnCustomersListener;
-import com.wovenpay.wovenpayments.interfaces.OnDeleteCustomerListener;
+import com.wovenpay.wovenpayments.interfaces.OnDeleteListener;
 import com.wovenpay.wovenpayments.interfaces.OnPaymentListener;
+import com.wovenpay.wovenpayments.interfaces.OnPlanListener;
+import com.wovenpay.wovenpayments.interfaces.OnPlansListener;
 import com.wovenpay.wovenpayments.interfaces.OnStatusListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenRefreshListener;
 import com.wovenpay.wovenpayments.interfaces.OnTokenVerifyListener;
 import com.wovenpay.wovenpayments.interfaces.OnTransactionsListener;
+import com.wovenpay.wovenpayments.interfaces.OnWebhookListener;
 import com.wovenpay.wovenpayments.models.AccountResponse;
 import com.wovenpay.wovenpayments.models.Business;
 import com.wovenpay.wovenpayments.models.Customer;
+import com.wovenpay.wovenpayments.models.Plan;
 import com.wovenpay.wovenpayments.models.Transaction;
+import com.wovenpay.wovenpayments.models.Webhook;
 
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     final String testPlan = "plan_jpcms2jwkvHbinJHvHygkZ";
 
     String testCustomer = "cus_JBkyB88VbjNhux2PQTivmH";
+    String planId = "plan_cskgawXtFdEHkYsfYtL6uH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +70,18 @@ public class MainActivity extends AppCompatActivity {
         Button bGetCustomer = findViewById(R.id.bGetCustomer);
         Button bGetCustomers = findViewById(R.id.bGetCustomers);
         Button bDeleteCustomer = findViewById(R.id.bDeleteCustomer);
+        Button bGetPlans = findViewById(R.id.bGetPlans);
+        Button bCreatePlan = findViewById(R.id.bCreatePlan);
+        Button bGetPlan = findViewById(R.id.bGetPlan);
+        Button bDeletePlan = findViewById(R.id.bDeletePlan);
+        Button bEditPlan = findViewById(R.id.bEditPlan);
+        Button bCreateWebhook = findViewById(R.id.bCreateWebhook);
+        Button bDeleteWebhook = findViewById(R.id.bDeleteWebhook);
 
         final WovenPay wovenPay = new WovenPay(apikey, apisecret, false);
         wovenPay.setVersion(1);
         wovenPay.getVersion();
-        wovenPay.setTimeout(5000);
+        wovenPay.setTimeout(5);
         wovenPay.getTimeout();
 
         bAuth.setOnClickListener(new View.OnClickListener() {
@@ -329,7 +343,7 @@ public class MainActivity extends AppCompatActivity {
         bDeleteCustomer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                wovenPay.deleteCustomer(testCustomer, new OnDeleteCustomerListener() {
+                wovenPay.deleteCustomer(testCustomer, new OnDeleteListener() {
                     @Override
                     public void onComplete(boolean success, String message) {
                         if (success) {
@@ -338,6 +352,138 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         tvAuth.setText(String.format("delete customer error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bGetPlans.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.getPlans(new OnPlansListener() {
+                    @Override
+                    public void onComplete(boolean success, List<Plan> planList, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Plans %s", new Gson().toJson(planList)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Get plans error %s", message));
+                    }
+                });
+            }
+        });
+
+        bCreatePlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Plan plan = new Plan();
+                plan.setPrice(1200.00);
+                plan.setName("Namejgasddkhfj");
+                plan.setBusiness(testBusiness);
+                wovenPay.createPlan(plan, new OnPlanListener() {
+                    @Override
+                    public void onComplete(boolean success, Plan plan, String message) {
+                        if (success) {
+                            planId = plan.getId();
+                            Toast.makeText(getApplicationContext(), plan.getId(), Toast.LENGTH_SHORT).show();
+                            tvAuth.setText(String.format("Plan created %s", new Gson().toJson(plan)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Plan creation error %s", message));
+                    }
+                });
+            }
+        });
+
+        bGetPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.getPlan(planId, new OnPlanListener() {
+                    @Override
+                    public void onComplete(boolean success, Plan plan, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Plan %s", new Gson().toJson(plan)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Get plan error %s", message));
+                    }
+                });
+            }
+        });
+
+        bEditPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Plan plan = new Plan();
+                plan.setName("Name name");
+                plan.setPrice(1_300.0);
+                wovenPay.editPlan(planId, plan, new OnPlanListener() {
+                    @Override
+                    public void onComplete(boolean success, Plan plan, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Edited plan %s", new Gson().toJson(plan)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Edited plan error %s", message));
+                    }
+                });
+            }
+        });
+
+        bDeletePlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.deletePlan(planId, new OnDeleteListener() {
+                    @Override
+                    public void onComplete(boolean success, String message) {
+                        if (success) {
+                            tvAuth.setText("Deleted plan");
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("delete customer error: %s", message));
+                    }
+                });
+            }
+        });
+
+        bCreateWebhook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Webhook webhook = new Webhook();
+                webhook.setEvent("customer.created");
+                webhook.setKey("test");
+                webhook.setTarget("https://paysstestf.ngrok.com/");
+                wovenPay.createWebhook(webhook, new OnWebhookListener() {
+                    @Override
+                    public void onComplete(boolean success, Webhook webhook, String message) {
+                        if (success) {
+                            tvAuth.setText(String.format("Created webhook %s", new Gson().toJson(webhook)));
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Create webhook error %s", message));
+                    }
+                });
+            }
+        });
+
+        bDeleteWebhook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                wovenPay.deleteWebhook("80", new OnDeleteListener() {
+                    @Override
+                    public void onComplete(boolean success, String message) {
+                        if (success) {
+                            tvAuth.setText("Deleted!");
+                            return;
+                        }
+
+                        tvAuth.setText(String.format("Delete webhook error", message));
                     }
                 });
             }
